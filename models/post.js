@@ -9,29 +9,29 @@ let mongoose = require('mongoose');
 //post model
 let postModel = mongoose.Schema(
     {
-        title: 
+        title:
         {
-             type: String,
-             default: 'Post title',
-             trim: true,
-             require: 'Post title required'
+            type: String,
+            default: 'Post title',
+            trim: true,
+            require: 'Post title required'
         },
 
         picture: String,
 
-        content: 
+        content:
         {
             type: String,
             default: 'Post description',
             trim: true,
             require: 'Post desription required'
-         },
+        },
 
-         date: 
-         {
+        date:
+        {
             type: Date,
             default: Date.now
-         }
+        }
     },
 
     {
