@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./server.js"
+    "start": "node ./server.js"
   },
   "dependencies": {
     "compression": "^1.7.4",
@@ -16,7 +16,9 @@
     "jquery": "^3.6.0",
     "method-override": "^3.0.0",
     "mongoose": "^6.0.8",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0"
   },
   "description": "COMP231.W23.T8 ExploreBooking",
   "main": "server.js",

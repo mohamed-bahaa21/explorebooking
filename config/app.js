@@ -12,6 +12,9 @@ let compress = require('compression');
 let bodyParser = require('body-parser');
 let methodOverride = require('method-override');
 let session = require('express-session');
+// chungyin 02/04/2023
+let flash = require('connect-flash');
+let passport = require('passport');
 
 
 let app = express();
@@ -24,7 +27,9 @@ app.use(session({
 
 
 let indexRouter = require('../routes/index');
-
+let postRouter = require('../routes/post');
+let userRouter = require('../routes/user'); //aalmario 02/04/2023
+let commentRouter = require('../routes/comment');
 
 // view engine setup
 app.set('views', path.join(__dirname, '../views'));
@@ -37,10 +42,17 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, '../node_modules')));
 
+// Sets up passport // chungyin 02/04/2023
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 //set up route
 app.use('/', indexRouter);
-
+app.use('/post', postRouter);
+app.use('/user', userRouter); //aalmario 02/04/2023
+app.use('/comment', commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

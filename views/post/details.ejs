@@ -1,0 +1,41 @@
+<%- include('../partials/header'); %>
+
+
+<div class="container pt-5">
+    <div class="row">
+      <h5 class="">Post Details</h5>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="card shadow-md" style="min-height: 400px !important;  ">
+          <p class="card-title p-5 fw-bold fs-1 text-center">
+            <%= post.title %>
+          </p>
+          <img
+            src="<%= post.picture %>"
+            style="object-fit: cover;"
+            class="bd-placeholder-img card-img-top"
+            width="100%"
+            height="600"
+            role="img"
+            aria-label="Placeholder: Thumbnail"
+          />
+          <div class="card-body">
+            <p class="card-text">Author: <%= owner %></p>
+            <p class="card-text"><%= post.date %></p>
+            <a href='/post/edit/<%= post.id %>' class="btn btn-outline-success">Edit Post</a>
+            <a href='/post/delete/<%= post.id %>' class="btn btn-outline-danger">Delete Post</a>
+            <div class="row p-3">
+              <div class="fs-4 fw-bold"> <%= post.content %> </div>
+            </div>
+          </div>
+          <%- include('./add_comment'); %>
+        </div>
+      </div>
+    </div>
+  </div>;
+  
+  
+
+
+<%- include('../partials/footer'); %>

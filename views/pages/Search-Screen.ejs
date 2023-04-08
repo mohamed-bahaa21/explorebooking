@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Screen</title>
+  </head>
+  <body>
+    <h1>Search</h1>
+    <form method="POST" action="/search">
+      <label for="searchQuery">Search:</label>
+      <input type="text" id="searchQuery" name="searchQuery"><br><br>
+      <label for="searchCriteria">Search Criteria:</label>
+      <select id="searchCriteria" name="searchCriteria">
+        <option value="title">Title</option>
+        <option value="content">Content</option>
+        <option value="image">Image</option>
+      </select><br><br>
+      <input type="submit" value="Search">
+    </form>
+  </body>
+</html>

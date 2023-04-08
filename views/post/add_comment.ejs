@@ -1,0 +1,15 @@
+<form class="form-group" method="POST" action="/comment/add">
+    <div class="p-5">
+        <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label fw-bold">Comments</label>
+            <textarea name="commentText" required class="form-control" id="exampleFormControlTextarea1" rows="4"
+                placeholder="Enter your comment"></textarea>
+        </div>
+        <div class="mb-3">
+            <div style="float: right;">
+                <input type="hidden" name="postId" value="<%= post._id %>">
+                <button  type="submit" class="btn btn-primary btn-md">Submit comment</button>
+            </div>
+        </div>
+    </div>
+</form>

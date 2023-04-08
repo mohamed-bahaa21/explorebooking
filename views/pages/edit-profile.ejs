@@ -1,0 +1,24 @@
+<div class="editProfile">
+      <center> <h1>Edit Profile</h1></center> <br>
+
+      <form action="#" method="POST">
+        <label for="username">Change Username:</label>
+        <input id="user" type="text" name="username" value="<%= userName %>"><br><br>
+
+        <label for="aboutMe">Change about me:</label>
+        <input id="about" type="text" name="aboutMe" value="<%= description %>"><br><br>
+
+        
+        <label for="interests">Change interests:</label>&nbsp;&nbsp;
+        <input id="interest" type="text" name="interests" value="<%= interests %>"><br><br>
+
+          
+        <label id="lblPass" for="password">Password:</label>
+        <input class="pass" type="password" name="password" placeholder="New password"><br><br>
+
+        <label for="confirmPassword">Confirm Password:</label>
+        <input class="pass" type="password" name="confirmPassword" placeholder="Confirm new password"><br><br>
+
+        <button id="sbmBtn" type="submit">Update</button>
+      </form>
+  </div>

@@ -5,6 +5,7 @@
 
 // Create a reference to the post model
 let Post = require("../models/post");
+let User = require("../models/user");
 
 function getErrorMessage(err) {
   if (err.errors) {
@@ -19,10 +20,9 @@ function getErrorMessage(err) {
   }
 }
 
-// Render Post Overviews (List of the post)
 
 // Render Post Details for Each Post
-module.exports.postDetails = (req, res, next) => {
+module.exports.displayPostDetails = (req, res, next) => {
 
   let id = req.params.id;
 
@@ -32,10 +32,21 @@ module.exports.postDetails = (req, res, next) => {
       res.end(err);
     }
     else {
-      //show the edit view
-      res.render('post/details', {
-        post: postToShow
-      })
+      User.findById(postToShow.owner, (err, user) => {
+        if (err){
+          console.log(err);
+          res.end(err);
+        }else{
+          //show the edit view
+          res.render('post/details', {
+            post: postToShow,
+            user: req.user ? req.user.firstName: '',
+            userType: req.user ? req.user.userType: '',
+            owner: user.firstName + " " + user.lastName
+          });
+        }
+      });
+
     }
   });
 }
@@ -48,7 +59,8 @@ module.exports.displayAddPage = (req, res, next) => {
   res.render('post/add_edit', {
     title: 'Add a New Post',
     post: newPost,
-    userName: req.user ? req.user.username : ''
+    user: req.user ? req.user.firstName: '',
+    userType: req.user ? req.user.userType: ''
   })
 
 }
@@ -59,13 +71,11 @@ module.exports.processAdd = (req, res, next) => {
     let newItem = Post({
       _id: req.body.id,
       title: req.body.title,
+      region: req.body.region,
       picture: req.body.picture,
       content: req.body.content,
-      date: req.body.date,
-      owner:
-        req.body.owner == null || req.body.owner == ""
-          ? req.payload.id
-          : req.body.owner,
+      date: new Date(),
+      owner: req.user.id
     });
 
     Post.create(newItem, (err, item) => {
@@ -77,10 +87,8 @@ module.exports.processAdd = (req, res, next) => {
           message: getErrorMessage(err),
         });
       } else {
-        // refresh the  list
         console.log(item);
         res.redirect('/');
-        res.status(200).json(item);
       }
     });
   } catch (error) {
@@ -96,17 +104,38 @@ module.exports.processAdd = (req, res, next) => {
 // Display Edit Page
 module.exports.displayEditPage = (req, res, next) => {
   let id = req.params.id;
-
-  Post.findById(id, (err, post) => {
+  let currentUser = req.user.id;
+  Post.findById(id, (err, postFound) => {
     if (err) {
       console.log(err);
       res.end(err);
     } else {
-      res.render('post/add_edit', {
-        title: 'Edit Post',
-        post: post,
-        userName: req.user ? req.user.username : ''
-      });
+      let owner = postFound.owner;
+      console.log("Process Edit. Owner ID:" + owner + " Requested ID: " + currentUser);
+      
+      if (owner == currentUser){
+        Post.findById(id, (err, post) => {
+          if (err) {
+            console.log(err);
+            res.end(err);
+          } else {
+            res.render('post/add_edit', {
+              title: 'Edit Post',
+              post: post,
+              user: req.user ? req.user.firstName: '',
+              userType: req.user ? req.user.userType: ''
+            })
+          }
+        });
+      }else{
+          console.log("Edit Rejected: Not the post owner.")
+          res.render('post/confirmation', {
+            user: req.user ? req.user.firstName: '',
+            userType: req.user ? req.user.userType: '',
+            post: postFound,
+            message: "Edit Rejected: Not the post owner."
+          });
+      }
     }
   });
 };
@@ -114,34 +143,143 @@ module.exports.displayEditPage = (req, res, next) => {
 // Process Edit Page
 module.exports.processEdit = (req, res, next) => {
   let id = req.params.id;
-
-  Post.findByIdAndUpdate(id, {
-    $set: {
-      title: req.body.title,
-      picture: req.body.picture,
-      content: req.body.content,
-      date: req.body.date
-    }
-  }, (err, post) => {
+  let currentUser = req.user.id;
+  Post.findById(id, (err, postFound) => {
     if (err) {
       console.log(err);
       res.end(err);
     } else {
-      res.redirect('/post/' + id);
+      let owner = postFound.owner;
+      console.log("Process Edit. Owner ID:" + owner + " Requested ID: " + currentUser);
+      
+      if (owner == currentUser){
+        // Edit post
+        Post.findByIdAndUpdate(id, {
+          $set: {
+            title: req.body.title,
+            region: req.body.region,
+            picture: req.body.picture,
+            content: req.body.content,
+            date: req.body.date
+          }
+        }, (err, post) => {
+          if (err) {
+            console.log(err);
+            res.end(err);
+          } else {
+            res.redirect('/post/details/' + id);
+          }
+        });
+      }else{
+        console.log("Edit Rejected: Not the post owner.")
+        res.render('post/confirmation', {
+          user: req.user ? req.user.firstName: '',
+          userType: req.user ? req.user.userType: '',
+          post: postFound,
+          message: "Edit Rejected: Not the post owner."
+        });
+      }
     }
   });
+
+  
 };
 
 // Perform Delete
 module.exports.deletePost = (req, res, next) => {
   let id = req.params.id;
+  let owner = "";
+  let currentUser = req.user.id;
+  let userType = req.user.userType;
 
-  Post.findByIdAndRemove(id, (err, post) => {
+  Post.findById(id, (err, postFound) => {
     if (err) {
       console.log(err);
       res.end(err);
     } else {
-      res.redirect('/');
+      owner = postFound.owner;
+      console.log("Process delete. Owner ID:" + owner + " Requested ID: " + currentUser + " UserType: " + userType);
+      
+      if (owner == currentUser || userType == 'admin'){
+        Post.findByIdAndRemove(id, (err, post) => {
+          if (err) {
+            console.log(err);
+            res.end(err);
+          } else {
+            res.render('post/deleteConfirmation', {
+              user: req.user ? req.user.firstName: '',
+              userType: req.user ? req.user.userType: '',
+              message: "Post successfully deleted."
+            });
+          }
+        });
+      }else{
+        console.log("Deletion Rejected: Not the post owner/Admin.")
+        res.render('post/deleteConfirmation', {
+          user: req.user ? req.user.firstName: '',
+          userType: req.user ? req.user.userType: '',
+          message: "Deletion Rejected: Not the post owner/Admin."
+        });
+      }
     }
   });
+
+  
 };
+
+// Perform filter by keywords
+module.exports.filterByKeywords = async (req, res, next) => {
+  try {
+    let keyword = req.body.keyword;
+    console.log("Searching keyword: " + keyword);
+    if (typeof keyword === 'string' && keyword.length > 0) {
+      const posts = await Post.find({ 
+        $or: [
+          { title: { $regex: keyword, $options: "i" } },
+          { content: { $regex: keyword, $options: "i" } }
+        ],
+      });
+      return res.render("index", {
+        title: 'Search Result: ' + keyword, 
+        postList: posts,
+        user: req.user ? req.user.firstName: '',
+        userType: req.user ? req.user.userType: '' 
+        });
+    }else{
+      res.redirect('/');
+    }
+    
+  } catch (err) {
+      return res.render("error", { message: err.message });
+    }
+};
+
+
+// Process Edit Page
+// module.exports.editPost = async (req, res) => {
+//   const { title, picture, content, postId, date } = req.body;
+//   try {
+//     if (!title || !picture || !content) {
+//       return res.status(400).json({
+//         success: false,
+//         message: `${
+//           !title ? "Title" : !picture ? "Picture" : "Content"
+//         } is required`,
+//       });
+//     }
+//     await Post.updateOne(
+//       { _id: postId },
+//       {
+//         title,
+//         picture,
+//         content: content,
+//         ...(date ? { date } : {}),
+//       }
+//     );
+//     return  res.redirect("/post/" + postId);
+//   } catch (err) {
+//     return res.render("error", { message: err.message });
+//   }
+// };
+
+

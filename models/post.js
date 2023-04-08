@@ -9,28 +9,39 @@ let mongoose = require('mongoose');
 //post model
 let postModel = mongoose.Schema(
     {
-        title:
+        title: 
         {
-            type: String,
-            default: 'Post title',
-            trim: true,
-            require: 'Post title required'
+             type: String,
+             default: 'Post title',
+             trim: true,
+             require: 'Post title required'
         },
 
         picture: String,
 
-        content:
+        content: 
         {
             type: String,
             default: 'Post description',
             trim: true,
             require: 'Post desription required'
-        },
-
-        date:
-        {
+         },
+         region: 
+         {
+             type: String,
+             default: 'Berat',
+             trim: true,
+             require: 'Region is required'
+          },
+         date: 
+         {
             type: Date,
             default: Date.now
+         },
+         // Add owner for authentication // by chungyin 02/04/2023
+         owner: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
         }
     },
 

@@ -4,7 +4,7 @@
 // Web App name: explorebooking
 
 // added my DB connection string aalmario
-let atlasDB = "mongodb+srv://COMP231W23-T8:2hIbHQfFR21cEMNC@comp231w23-t8.e8jm5ef.mongodb.net/test";
+let atlasDB = "mongodb+srv://COMP231W23-T8:2hIbHQfFR21cEMNC@comp231w23-t8.e8jm5ef.mongodb.net/databank";
 
 // Database setup
 let mongoose = require('mongoose');
