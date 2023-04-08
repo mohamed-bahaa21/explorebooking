@@ -14,6 +14,10 @@ router.get('/', userController.userProfile);
 router.get('/login', userController.renderLogin);
 router.post('/login', userController.processLogin);
 
+// Routes for login
+router.get('/signup', userController.renderSignup);
+router.post('/signup', userController.processSignup);
+
 // Route for logout
 router.get('/logout', userController.logout);
 
